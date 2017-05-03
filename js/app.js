@@ -10,7 +10,7 @@ var app = new Vue({
 
             currentArtist: '',
 
-            appId: '',
+            appId: 'ABCDEF12345'/* trial application key for trial (gives only a limited access to data) */,
 
             AllArtists: [],
 
@@ -21,7 +21,11 @@ var app = new Vue({
             zelyricsVisibility: true,
             loading: false,
 
-            isActive: true
+            isActive: true,
+
+            presentArtist: '',
+            presentLyricsTitle: '',
+            presentLyricsText: ''
 
         },
         watch: {
@@ -50,7 +54,6 @@ var app = new Vue({
                     .then(function(response){
                         app.AllArtists = response.data.result
                         app.currentArtist = ''
-                        app.lyricsFetched = response.data.result
                         app.AllArtistsVisibility = true
                         app.LyricsVisibility = false
                         app.ArtistLyricsVisibility = false
@@ -63,6 +66,7 @@ var app = new Vue({
                     })
             },
             viewArtist: _.debounce(function(message, event){
+                this.currentLyricsArtistPhoto = ''
                 this.loading = true;
                 var app = this  // for variable inheritance purposes
                 if(event){
@@ -74,7 +78,6 @@ var app = new Vue({
                             app.ArtistLyricsVisibility = true
                             app.currentArtist = message
                             app.getImage(message)
-                            app.loading = false
                         })
                         .catch(function (error) {
                             if(error.status){
@@ -84,17 +87,20 @@ var app = new Vue({
                 }
             }, 500),
             viewLyrics: function(message, event){
+                this.currentLyricsArtistPhoto = ''
                 this.loading = true // loading animation start
                 var app = this  // for variable inheritance purposes
                 if(event){
                     axios.get('http://api.zelyrics.com/rest1/getLyrics/'+ app.appId + '/' + message)
                         .then(function(response){
                             app.lyricsFetched = response.data.result
+                            app.presentArtist = app.lyricsFetched.artist
+                            app.presentLyricsTitle = app.lyricsFetched.title
+                            app.presentLyricsText = app.lyricsFetched.lyrics_text
                             app.AllArtistsVisibility = false
                             app.LyricsVisibility = true
                             app.ArtistLyricsVisibility = false
                             app.getImage(app.currentArtist)
-                            app.loading = false // loading animation end
                         })
                         .catch(function (error) {
                             if(error.status){
@@ -108,7 +114,7 @@ var app = new Vue({
                 var app = this  // for variable inheritance purposes
                     axios.get('http://api.zelyrics.com/rest1/getArtist/'+ app.appId + '/?artist=' + message)
                         .then(function(response){
-                            app.currentLyricsArtistPhoto = response.data.result["0"].ArtistPhoto
+                            app.currentLyricsArtistPhoto = response.data.result.photo
                             if(app.currentLyricsArtistPhoto != null){
                                 app.artistPhotoVisibility = true
                                 app.loading = false // loading animation end
