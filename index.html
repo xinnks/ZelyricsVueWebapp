@@ -1,0 +1,211 @@
+
+<!doctype html>
+<html lang="english">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Zelyrics</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/images/favicons/manifest.json">
+    <link rel="mask-icon" href="/images/favicons/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="/images/favicons/favicon.ico">
+    <meta name="msapplication-config" content="/images/favicons/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+
+    <!-- css -->
+    <link rel="stylesheet" href="/css/app.css">
+
+
+    <!-- Styles -->
+    <style>
+        html, body {
+            background-color: #fff;
+            color: #636b6f;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+            height: 100vh;
+            margin: 0;
+        }
+        .footer{
+            background-color: #204d74;
+            color: #fff;
+            height: 80px;
+        }
+        .footer-credits{
+            margin-top: 30px;
+            font-size: 14px;
+        }
+        .footer-justify{
+            height: 50px;
+        }
+        .btn{
+            border-radius: 0;
+            font-weight: 600;
+        }
+        .navbar{
+            /*background-color: #e3f2fd;*/
+        }
+        .my-hr{
+            border-top: 1px solid #1f648b;
+        }
+        .menu-brand{
+            height: 80px;
+            width: 80px;
+            margin: 10px auto;
+        }
+
+        .text-center > h3, select > option{
+            font-weight: 600;
+        }
+        #form_sadaka{
+            background-color: #ccffcc;
+            border: solid 1px #419641;
+        }
+        #form_zaka{
+            background-color: #e6f3f7;
+            border: solid 1px #28a4c9;
+        }
+        #form_somo{
+            background-color: #f9e3c2;
+            border: solid 1px #eea236;#b92c28
+        }
+        #form_shukrani{
+            background-color: #f1d4d4;
+            border: solid 1px #b92c28;
+        }
+        #artist-image{
+            height: auto;
+            width: 50%;
+            margin: 10px auto;
+        }
+        li{
+            cursor: hand;
+        }
+        .lyrics-wrapper{
+            background-color: #f9f9f9;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+        }
+        .lyrics-tittle{
+            background-color: rgba(255,255,255, 0.8);
+            margin:3px auto;
+            height: 50px;
+            width: auto;
+            font-size: 4vmin;
+            font-weight: 800;
+        }
+        .page-load{
+            z-index: 1000;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            background-color: rgba(255,255,255,0.7);
+        }
+        .load-img{
+            z-index: 2000;
+            position: absolute;
+            margin-top: 20%;
+            margin-left: 45%;
+        }
+
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar" role="navigation">
+    <div class="container text-center">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="text-center">
+            <a v-on:click="firstRender" href=""><img class="menu-brand" src="/images/favicons/apple-touch-icon.png" alt="zelyrics"></a>        </div>
+        <div class="row col-md-8 col-md-offset-2">
+            <hr class="my-hr">
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+<div class="container" id="app">
+
+    <i  v-show="loading" class="page-load"><i class="text-center load-img"><img height="194" width="194" src="images/hourglass.gif" alt=""></i></i>
+
+    <div class="row col-md-8 col-md-offset-2" v-show="zelyricsVisibility">
+
+        <div class="col-md-12" v-show="AllArtistsVisibility">
+            <ul class="list-group">
+                <li class="list-group-item" v-on:click="viewArtist(artist.Name, $event)"  v-for="artist in AllArtists">
+                    <a class="btn btn-lg btn-block">{{ artist.Name }}</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-md-12" v-show="ArtistLyricsVisibility" v-bind:style='{ backgroundImage: "url(" + currentLyricsArtistPhoto + ")", }' :alt="currentLyricsArtist">
+
+            <div class="text-right">
+                <button class="btn btn-danger" v-on:click="firstRender">X</button>
+            </div>
+
+            <div class="text-center" v-show="artistPhotoVisibility">
+                <img id="artist-image" :src="currentLyricsArtistPhoto">
+            </div>
+
+            <div class="text-center"></div>
+            <ul class="list-group">
+                <li class="list-group-item" v-on:click="viewLyrics(lyrics.idNo, $event)" v-for="lyrics in artistLyrics">
+                    <a class="btn btn-lg btn-block">{{ lyrics.Tittle }}</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-md-12" v-show="LyricsVisibility" v-bind:style='{ backgroundImage: "url(" + currentLyricsArtistPhoto + ")", }' v-for="item in lyricsFetched">
+
+            <div class="text-right">
+                <button class="btn btn-danger" v-on:click="viewArtist(currentArtist, $event)">X</button>
+            </div>
+
+            <div class="text-center" v-show="artistPhotoVisibility">
+                <img id="artist-image" :src="currentLyricsArtistPhoto">
+            </div>
+
+            <div class="text-center lyrics-tittle"> {{ item.Artist }} - {{ item.Tittle }} </div>
+
+           <p class="text-center lyrics-wrapper" v-html="item.LyricsText"></p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container-fluid footer">
+    <div class="row">
+        <div class="text-center footer-justify">
+        </div>
+        <div class="text-center">
+            <span class="footer-credits">Zelyrics 2017</span>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<!-- lodash.js -->
+<script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
+<!-- axios.js (for http requests)-->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="/js/vue.js"></script>
+<script src="/js/app.js"></script>
+</html>
