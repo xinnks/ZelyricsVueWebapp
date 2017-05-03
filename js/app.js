@@ -10,7 +10,7 @@ var app = new Vue({
 
             currentArtist: '',
 
-            appId: ''/* application id*/,
+            appId: '',
 
             AllArtists: [],
 
@@ -19,7 +19,9 @@ var app = new Vue({
             ArtistLyricsVisibility: false,
             LyricsVisibility: false,
             zelyricsVisibility: true,
-            loading: false
+            loading: false,
+
+            isActive: true
 
         },
         watch: {
